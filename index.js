@@ -1,12 +1,17 @@
-const op = require("./operations");
+const http = require('http');
 
-const a = 10;
-const b = 20;
+const hostName = "localhost";
+const port = 3000;
 
-const sum = op.sum(a,b);
+const server = http.createServer((req, res) => {
+    console.log("req",req.headers);
+    console.log("response: " + res.req);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end('Bharath');
 
-console.log("sum: " + sum);
+})
 
-const sub = op.sub(b,a);
-
-console.log("sub: " + sub);
+server.listen(port, hostName, () => {
+console.log(`server listening at http://${hostName}:${port}`);
+})
