@@ -6,7 +6,7 @@ const hostName = "localhost";
 const port = 3000;
 
 const server = http.createServer((req, res) => {
-  console.log("req for " + req.url + "by method " + req.method);
+  console.log("req for " + req.url + " by method " + req.method);
 
   if (req.method === "GET") {
     var fileUrl;
@@ -15,10 +15,11 @@ const server = http.createServer((req, res) => {
     } else fileUrl = req.url;
 
     let filePath = path.resolve("./HTML" + fileUrl);
+    console.log("filePath for " + filePath);
     const fileExt = path.extname(filePath);
 
     if (fileExt === ".html") {
-      fs.existsSync(filePath, (exists) => {
+      fs.exists(filePath, (exists) => {
         if (!exists) {
           res.statusCode = 404;
           res.setHeader("Content-Type", "text/html");
