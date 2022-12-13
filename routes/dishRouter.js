@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 
 const dishRouter = express.Router();
 
+dishRouter.use(bodyParser.json());
+
 
 dishRouter.route('/')
 .all((req,res,next) => {
@@ -44,3 +46,6 @@ dishRouter.route('/')
   .delete('/dishes/:dishId', (req, res, next) => {
     res.end("Deleting dish :", req.params.dishId);
   }); */
+
+
+  module.exports = dishRouter;
