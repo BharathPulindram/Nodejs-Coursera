@@ -1,0 +1,19 @@
+{
+  "name": "mongo",
+  "version": "1.0.0",
+  "description": "node mongodb",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node mongooseIndex"
+  },
+  "author": "Bharath Pulindram",
+  "license": "ISC",
+  "dependencies": {
+    "assert": "^2.0.0",
+    "dotenv": "^16.0.3",
+    "mongodb": "^4.12.1",
+    "mongoose": "^6.8.0"
+  }
+}
