@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Users = require('./models/userModel');
-const CONNECTION__URL = require('./connectionString');
+const CONNECTION__URL = require('../Express-Generator/expressServer/connectionString');
 
 mongoose.set('strictQuery', true);
 const connect = mongoose.connect(CONNECTION__URL);

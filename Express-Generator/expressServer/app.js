@@ -8,6 +8,16 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var dishRouter = require('./routes/dishRouter');
 
+var mongoose = require('mongoose');
+var User = require('./models/userModel');
+
+const url = require('./connectionString');
+const connect = mongoose.connect(url);
+
+connect.then((db) => {
+  console.log("db connection established");
+}, (err) => console.log("err",err));
+
 var app = express();
 
 // view engine setup
