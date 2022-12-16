@@ -1,2 +1,2 @@
-const CONNECTION__URL = "mongodb+srv://admin:nwm8hmwjgXY1BkkB@clusterbharath.tgwppbc.mongodb.net/bharath?retryWrites=true&w=majority";
-export default CONNECTION__URL;
+const CONNECTION__URL = "mongodb+srv://admin:fPvP5KejLYCWrEwn@clusterbharath.tgwppbc.mongodb.net/bharath?retryWrites=true&w=majority";
+module.exports = CONNECTION__URL;

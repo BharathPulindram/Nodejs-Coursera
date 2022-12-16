@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const locationSchema = new Schema({
+    street: String,
+    city: String,
+    state: String,
+    postCode: Number
+});
+
 const UserSchema = new Schema({
     email:{
         type: String,
@@ -18,12 +25,6 @@ const UserSchema = new Schema({
     picture:String
 })
 
-const locationSchema = new Schema({
-    street: String,
-    city: String,
-    state: String,
-    postCode: Number
-});
 
 var users = mongoose.model('user',UserSchema);
 
