@@ -3,12 +3,14 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var dishRouter = require("./routes/dishRouter");
 
-var mongoose = require("mongoose");
+/* var mongoose = require("mongoose");
 var User = require("./models/userModel");
 
 const url = require("./connectionString");
@@ -19,7 +21,7 @@ connect.then(
     console.log("db connection established");
   },
   (err) => console.log("err", err)
-);
+); */
 
 var app = express();
 
@@ -30,33 +32,57 @@ app.set("view engine", "jade");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+//app.use(cookieParser("1234-5678-9012"));
+
+app.use(session({
+  name: 'session-id',
+  secret: '12345-67890-09876-54321',
+  saveUninitialized: false,
+  resave: false,
+  store: new FileStore()
+}));
 
 function auth(req, res, next) {
   console.log("req.headers :", req.headers);
-  var authHeader = req.headers.authorization;
-  if (!authHeader) {
-    var err = new Error("You are not authorized");
-    res.setHeader("WWW-Authenticate", "Basic");
-    err.status = 401;
-    return next(err);
-  }
-
-  console.log("authHeader :", authHeader);
-
-  var auth = new Buffer(authHeader.split(' ')[1], 'base64').toString().split(':');
-  var userName = auth[0];
-  var password = auth[1];
-
-  if(userName==='admin' && password === 'password') {
-    next();
+  console.log("req.session.user",req.session.user)
+  if (!req.session.user){
+    var authHeader = req.headers.authorization;
+    if (!authHeader) {
+      var err = new Error("You are not authorized");
+      res.setHeader("WWW-Authenticate", "Basic");
+      err.status = 401;
+      return next(err);
+    }
+  
+    console.log("authHeader :", authHeader);
+  
+    var auth = new Buffer.from(authHeader.split(" ")[1], "base64")
+      .toString()
+      .split(":");
+    var userName = auth[0];
+    var password = auth[1];
+  
+    if (userName === "admin" && password === "password") {
+      req.session.user = 'admin';
+      next();
+    } else {
+      var err = new Error("You are not authorized");
+      res.setHeader("WWW-Authenticate", "Basic");
+      err.status = 401;
+      return next(err);
+    }
   }else{
-    var err = new Error("You are not authorized");
-    res.setHeader("WWW-Authenticate", "Basic");
-    err.status = 401;
-    return next(err);
+    if (req.session.user === 'admin') {
+      console.log('req.session: ',req.session);
+      next();
   }
-
+  else {
+      var err = new Error('You are not authenticated!');
+      err.status = 401;
+      next(err);
+  }
+  }
+  
 }
 
 app.use(auth);
