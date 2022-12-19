@@ -8,7 +8,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var dishRouter = require("./routes/dishRouter");
 
-var mongoose = require("mongoose");
+/* var mongoose = require("mongoose");
 var User = require("./models/userModel");
 
 const url = require("./connectionString");
@@ -19,7 +19,7 @@ connect.then(
     console.log("db connection established");
   },
   (err) => console.log("err", err)
-);
+); */
 
 var app = express();
 
@@ -30,33 +30,48 @@ app.set("view engine", "jade");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser("1234-5678-9012"));
 
 function auth(req, res, next) {
   console.log("req.headers :", req.headers);
-  var authHeader = req.headers.authorization;
-  if (!authHeader) {
-    var err = new Error("You are not authorized");
-    res.setHeader("WWW-Authenticate", "Basic");
-    err.status = 401;
-    return next(err);
-  }
-
-  console.log("authHeader :", authHeader);
-
-  var auth = new Buffer(authHeader.split(' ')[1], 'base64').toString().split(':');
-  var userName = auth[0];
-  var password = auth[1];
-
-  if(userName==='admin' && password === 'password') {
-    next();
+  console.log("req.signedCookies.user",req.signedCookies.user)
+  if (!req.signedCookies.user){
+    var authHeader = req.headers.authorization;
+    if (!authHeader) {
+      var err = new Error("You are not authorized");
+      res.setHeader("WWW-Authenticate", "Basic");
+      err.status = 401;
+      return next(err);
+    }
+  
+    console.log("authHeader :", authHeader);
+  
+    var auth = new Buffer(authHeader.split(" ")[1], "base64")
+      .toString()
+      .split(":");
+    var userName = auth[0];
+    var password = auth[1];
+  
+    if (userName === "admin" && password === "password") {
+      res.cookie('user','admin',{signed: true});
+      next();
+    } else {
+      var err = new Error("You are not authorized");
+      res.setHeader("WWW-Authenticate", "Basic");
+      err.status = 401;
+      return next(err);
+    }
   }else{
-    var err = new Error("You are not authorized");
-    res.setHeader("WWW-Authenticate", "Basic");
-    err.status = 401;
-    return next(err);
+    if (req.signedCookies.user === 'admin') {
+      next();
   }
-
+  else {
+      var err = new Error('You are not authenticated!');
+      err.status = 401;
+      next(err);
+  }
+  }
+  
 }
 
 app.use(auth);
