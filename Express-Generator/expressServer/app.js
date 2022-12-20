@@ -10,7 +10,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var dishRouter = require("./routes/dishRouter");
 
-/* var mongoose = require("mongoose");
+var mongoose = require("mongoose");
 var User = require("./models/userModel");
 
 const url = require("./connectionString");
@@ -21,7 +21,7 @@ connect.then(
     console.log("db connection established");
   },
   (err) => console.log("err", err)
-); */
+);
 
 var app = express();
 
@@ -44,7 +44,28 @@ app.use(
   })
 );
 
+app.use("/", indexRouter);
+app.use("/users", usersRouter);
+
 function auth(req, res, next) {
+  console.log(req.session);
+
+  if (!req.session.user) {
+    var err = new Error("You are not authenticated!");
+    err.status = 403;
+    return next(err);
+  } else {
+    if (req.session.user === "authenticated") {
+      next();
+    } else {
+      var err = new Error("You are not authenticated!");
+      err.status = 403;
+      return next(err);
+    }
+  }
+}
+
+/* function auth(req, res, next) {
   console.log("req.headers :", req.headers);
   console.log("req.session.user", req.session.user);
   if (!req.session.user) {
@@ -83,14 +104,11 @@ function auth(req, res, next) {
       next(err);
     }
   }
-}
+} */
 
 app.use(auth);
 
 app.use(express.static(path.join(__dirname, "public")));
-
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
 app.use("/dishes", dishRouter);
 
 // catch 404 and forward to error handler
